@@ -39,7 +39,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-4 gap-4 justify-center p-2">
         {#each events as event}
             <div class="card border border-base-content/5 bg-base-125 shadow-md p-4 rounded-lg">
-                <span class="badge badge-ghost p-1 mb-2">{event.time}</span>
+                <span class="badge badge-soft p-2 mb-2">{event.time}</span>
                 <p class="text-lg font-bold">{event.name}</p>
                 <p class="text mt-1">{event.location}</p>
                 <div class="divider"></div>
