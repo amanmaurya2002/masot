@@ -34,40 +34,26 @@
     ];
 </script>
 
-<style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-    }
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-    th {
-        background-color: #f4f4f4;
-    }
-</style>
-
-<h1>Events in Chandigarh</h1>
-<table>
-    <thead>
-        <tr>
-            <th>Event Name</th>
-            <th>Date</th>
-            <th>Location</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        {#each events as event}
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+    <table class="table">
+        <thead>
             <tr>
-                <td>{event.name}</td>
-                <td>{event.date}</td>
-                <td>{event.location}</td>
-                <td>{event.description}</td>
+                <th>Event Name</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Description</th>
             </tr>
-        {/each}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {#each events as event}
+                <tr>
+                    <td>{event.name}</td>
+                    <td>{event.date}</td>
+                    <td>{event.location}</td>
+                    <td>{event.description}</td>
+                </tr>
+            {/each}
+        </tbody>
+    </table>
+</div>
+
