@@ -9,51 +9,43 @@
     let events = [
         {
             name: "IPL 2025: Punjab Kings vs. Rajasthan Royals",
-            date: "April 5, 2025",
+            time: "April 5, 2025",
             location: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
-            description: "An exciting IPL match featuring Punjab Kings and Rajasthan Royals."
+            other_info: "An exciting IPL match featuring Punjab Kings and Rajasthan Royals."
         },
         {
             name: "IPL 2025: Punjab Kings vs. Chennai Super Kings",
-            date: "April 8, 2025",
+            time: "April 8, 2025",
             location: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
-            description: "A thrilling encounter between Punjab Kings and Chennai Super Kings."
+            other_info: "A thrilling encounter between Punjab Kings and Chennai Super Kings."
         },
         {
             name: "IPL 2025: Punjab Kings vs. Kolkata Knight Riders",
-            date: "April 15, 2025",
+            time: "April 15, 2025",
             location: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
-            description: "A high-energy match between Punjab Kings and Kolkata Knight Riders."
+            other_info: "A high-energy match between Punjab Kings and Kolkata Knight Riders."
         },
         {
             name: "IPL 2025: Punjab Kings vs. Royal Challengers Bengaluru",
-            date: "April 20, 2025",
+            time: "April 20, 2025",
             location: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
-            description: "A must-watch game between Punjab Kings and Royal Challengers Bengaluru."
+            other_info: "A must-watch game between Punjab Kings and Royal Challengers Bengaluru."
         }
     ];
 </script>
 
-<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Event Name</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            {#each events as event}
-                <tr>
-                    <td>{event.name}</td>
-                    <td>{event.date}</td>
-                    <td>{event.location}</td>
-                    <td>{event.description}</td>
-                </tr>
-            {/each}
-        </tbody>
-    </table>
+<div class="p-4">
+    <p class="text-4xl text-center mb-4">Events in Chandigarh</p>
+    <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-4 gap-4 justify-center p-2">
+        {#each events as event}
+            <div class="card border border-base-content/5 bg-base-125 shadow-md p-4 rounded-lg">
+                <span class="badge badge-ghost p-1 mb-2">{event.time}</span>
+                <p class="text-lg font-bold">{event.name}</p>
+                <p class="text mt-1">{event.location}</p>
+                <div class="divider"></div>
+                <p class="text-sm text-gray-500">{event.other_info}</p>
+            </div>
+        {/each}
+    </div>
 </div>
 
