@@ -1,22 +1,35 @@
+<!-- 
+    This website is designed to help people find events in Chandigarh 
+    where they can hang out with friends and enjoy various activities. 
+    It showcases a variety of events, including cultural festivals, 
+    food gatherings, and sports matches.
+-->
+
 <script>
     let events = [
         {
-            name: "Chandigarh Carnival",
-            date: "March 15, 2023",
-            location: "Leisure Valley",
-            description: "A vibrant festival showcasing art, culture, and music."
+            name: "IPL 2025: Punjab Kings vs. Rajasthan Royals",
+            date: "April 5, 2025",
+            location: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
+            description: "An exciting IPL match featuring Punjab Kings and Rajasthan Royals."
         },
         {
-            name: "Rose Festival",
-            date: "February 25, 2023",
-            location: "Zakir Hussain Rose Garden",
-            description: "An annual celebration of blooming roses and cultural events."
+            name: "IPL 2025: Punjab Kings vs. Chennai Super Kings",
+            date: "April 8, 2025",
+            location: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
+            description: "A thrilling encounter between Punjab Kings and Chennai Super Kings."
         },
         {
-            name: "Food Truck Festival",
-            date: "April 10, 2023",
-            location: "Sector 17 Plaza",
-            description: "A gathering of food trucks offering diverse cuisines."
+            name: "IPL 2025: Punjab Kings vs. Kolkata Knight Riders",
+            date: "April 15, 2025",
+            location: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
+            description: "A high-energy match between Punjab Kings and Kolkata Knight Riders."
+        },
+        {
+            name: "IPL 2025: Punjab Kings vs. Royal Challengers Bengaluru",
+            date: "April 20, 2025",
+            location: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
+            description: "A must-watch game between Punjab Kings and Royal Challengers Bengaluru."
         }
     ];
 </script>
