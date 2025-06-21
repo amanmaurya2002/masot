@@ -1,7 +1,9 @@
+"use client";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 // Event data
-const events = [
+const initialEvents = [
   {
     id: 1,
     title: "IPL 2025: Punjab Kings vs. Rajasthan Royals",
@@ -96,6 +98,23 @@ const categoryColors = {
 };
 
 export default function Home() {
+  const [events, setEvents] = useState(initialEvents);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("events");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setEvents(parsed);
+        }
+      } catch {
+        console.error("Failed to parse stored events");
+      }
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
