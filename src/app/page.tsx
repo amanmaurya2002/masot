@@ -2,91 +2,19 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-// Event data
-const initialEvents = [
-  {
-    id: 1,
-    title: "IPL 2025: Punjab Kings vs. Rajasthan Royals",
-    date: "April 5, 2025",
-    time: "7:30 PM",
-    venue: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
-    description: "An exciting IPL match featuring Punjab Kings and Rajasthan Royals.",
-    category: "Sports",
-    price: "₹500 - ₹5000"
-  },
-  {
-    id: 2,
-    title: "IPL 2025: Punjab Kings vs. Chennai Super Kings",
-    date: "April 8, 2025",
-    time: "7:30 PM",
-    venue: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
-    description: "A thrilling encounter between Punjab Kings and Chennai Super Kings.",
-    category: "Sports",
-    price: "₹500 - ₹5000"
-  },
-  {
-    id: 3,
-    title: "IPL 2025: Punjab Kings vs. Kolkata Knight Riders",
-    date: "April 15, 2025",
-    time: "7:30 PM",
-    venue: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
-    description: "A high-energy match between Punjab Kings and Kolkata Knight Riders.",
-    category: "Sports",
-    price: "₹500 - ₹5000"
-  },
-  {
-    id: 4,
-    title: "IPL 2025: Punjab Kings vs. Royal Challengers Bengaluru",
-    date: "April 20, 2025",
-    time: "7:30 PM",
-    venue: "Maharaja Yadavindra Singh Cricket Stadium, Mohali",
-    description: "A must-watch game between Punjab Kings and Royal Challengers Bengaluru.",
-    category: "Sports",
-    price: "₹500 - ₹5000"
-  },
-  {
-    id: 5,
-    title: "Chandigarh Literature Festival",
-    date: "April 12, 2025",
-    time: "10:00 AM",
-    venue: "Tagore Theatre, Sector 18",
-    description: "A celebration of literature featuring renowned authors, poets, and literary discussions.",
-    category: "Culture",
-    price: "Free"
-  },
-  {
-    id: 6,
-    title: "Rock Garden Music Festival",
-    date: "April 18, 2025",
-    time: "6:00 PM",
-    venue: "Rock Garden, Sector 1",
-    description: "An evening of live music performances in the beautiful Rock Garden setting.",
-    category: "Music",
-    price: "₹300"
-  },
-  {
-    id: 7,
-    title: "Food Festival at Sukhna Lake",
-    date: "April 25, 2025",
-    time: "5:00 PM",
-    venue: "Sukhna Lake, Sector 1",
-    description: "Experience the best of Punjabi cuisine and street food by the lake.",
-    category: "Food",
-    image: "/food-festival.jpg",
-    price: "₹200"
-  },
-  {
-    id: 8,
-    title: "Art Exhibition: Modern Chandigarh",
-    date: "April 30, 2025",
-    time: "11:00 AM",
-    venue: "Government Museum and Art Gallery, Sector 10",
-    description: "Contemporary art exhibition showcasing local and national artists.",
-    category: "Art",
-    image: "/art-exhibition.jpg",
-    price: "₹100"
-  }
-];
+interface Event {
+  id: number;
+  title: string;
+  date: string;
+  time: string;
+  venue: string;
+  description: string;
+  category: string;
+  price: string;
+  image?: string;
+  disabled?: boolean;
+  custom?: boolean;
+}
 
 // Category colors
 const categoryColors = {
@@ -98,21 +26,46 @@ const categoryColors = {
 };
 
 export default function Home() {
-  const [events, setEvents] = useState(initialEvents);
+  const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = localStorage.getItem("events");
-    if (stored) {
+    const loadEvents = async () => {
+      const backend = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const endpoint = backend ? `${backend.replace(/\/$/, "")}/events` : "/api/events";
+
+      let fetched: Event[] = [];
       try {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setEvents(parsed);
+        const res = await fetch(endpoint);
+        if (res.ok) {
+          fetched = await res.json();
         }
-      } catch {
-        console.error("Failed to parse stored events");
+      } catch (err) {
+        console.error("Failed to fetch remote events", err);
       }
-    }
+
+      // Pull locally managed data (custom + disabled)
+      let custom: Event[] = [];
+      let disabled: number[] = [];
+      if (typeof window !== "undefined") {
+        try {
+          const c = localStorage.getItem("customEvents");
+          if (c) custom = JSON.parse(c);
+        } catch {}
+        try {
+          const d = localStorage.getItem("disabledEventIds");
+          if (d) disabled = JSON.parse(d);
+        } catch {}
+      }
+
+      const combined = [
+        ...fetched.filter((e) => !disabled.includes(e.id)),
+        ...custom.filter((e) => !e.disabled),
+      ];
+
+      setEvents(combined.length ? combined : fetched);
+    };
+
+    loadEvents();
   }, []);
 
   return (
