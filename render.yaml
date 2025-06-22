@@ -55,14 +55,9 @@ services:
           type: web
           name: masot-backend
           property: hostport
-      # SvelteKit adapter-node requires HOST and PORT
+      # SvelteKit adapter-node requires HOST. It will use the PORT env var provided by Render.
       - key: HOST
         value: "0.0.0.0"
-      - key: PORT
-        fromService:
-          type: web
-          name: masot-frontend
-          property: port
 
 # Environment Groups
 # Define secret groups that can be shared across services.
