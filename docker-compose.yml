@@ -37,7 +37,10 @@ services:
       - "3000:3000"
     environment:
       - VITE_BACKEND_URL=http://backend:8000
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
     restart: unless-stopped
 
 volumes:
-  postgres_data: 
+  postgres_data:
