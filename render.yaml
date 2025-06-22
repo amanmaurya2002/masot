@@ -1,0 +1,68 @@
+# render.yaml
+# This file configures the deployment of the services on Render.
+
+services:
+  # 1. PostgreSQL Database
+  - type: psql
+    name: masot-postgres
+    # The following are example values. Adjust them as needed.
+    # See https://render.com/docs/yaml-spec#databases
+    plan: free # 'starter' is a good paid option
+    region: oregon
+    ipAllowList: [] # Allow all IPs to connect, or specify your own
+    pgaEnabled: false
+
+  # 2. FastAPI Backend Service
+  - type: web
+    name: masot-backend
+    runtime: python
+    region: oregon
+    plan: free
+    # Tell Render where the backend code is located
+    rootDir: ./apps/backend
+    # Commands to build and run the service
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: "/"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      # Reference the database connection string from the postgres service
+      - key: DATABASE_URL
+        fromService:
+          type: psql
+          name: masot-postgres
+          property: connectionString
+      # Create an environment group in the Render dashboard for your secrets
+      # See https://render.com/docs/yaml-spec#environment-groups
+      - fromGroup: masot-secrets
+
+  # 3. SvelteKit Frontend Service
+  - type: web
+    name: masot-frontend
+    runtime: node
+    region: oregon
+    plan: free
+    # Tell Render where the frontend code is located
+    rootDir: ./apps/frontend
+    # Commands to build and run the service
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm start"
+    healthCheckPath: "/"
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      # Reference the backend URL from the backend service
+      - key: VITE_BACKEND_URL
+        fromService:
+          type: web
+          name: masot-backend
+          property: url
+      # SvelteKit adapter-node requires HOST and PORT
+      - key: HOST
+        value: "0.0.0.0"
+      - key: PORT
+        fromService:
+          type: web
+          name: masot-frontend
+          property: port 
