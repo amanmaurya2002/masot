@@ -31,8 +31,7 @@ services:
         fromDatabase:
           name: masot-postgres
           property: connectionString
-      # Create an environment group in the Render dashboard for your secrets
-      # See https://render.com/docs/yaml-spec#environment-groups
+      # Link to the environment group defined below
       - fromGroup: masot-secrets
 
   # 3. SvelteKit Frontend Service
@@ -63,4 +62,13 @@ services:
         fromService:
           type: web
           name: masot-frontend
-          property: port 
+          property: port
+
+# Environment Groups
+# Define secret groups that can be shared across services.
+# See https://render.com/docs/yaml-spec#environment-groups
+envVarGroups:
+  - name: masot-secrets
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true # Render will generate a secure, random value 
