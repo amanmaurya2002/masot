@@ -55,7 +55,7 @@ services:
         fromService:
           type: web
           name: masot-backend
-          property: url
+          property: hostport
       # SvelteKit adapter-node requires HOST and PORT
       - key: HOST
         value: "0.0.0.0"
