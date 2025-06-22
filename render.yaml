@@ -25,7 +25,7 @@ services:
     healthCheckPath: "/"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11
+        value: 3.11.9
       # Reference the database connection string from the postgres service
       - key: DATABASE_URL
         fromDatabase:
