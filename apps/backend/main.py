@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .models import create_tables
-from .api import events, news
+from models import create_tables
+from api import events, news
 
 app = FastAPI(title="MASOT API", version="1.0.0")
 
@@ -26,4 +26,4 @@ app.include_router(news.router)
 
 @app.get("/")
 async def root():
-    return {"message": "MASOT API is running!"} 
+    return {"message": "MASOT API is running!"}

@@ -31,14 +31,12 @@ services:
     build:
       context: ./apps/frontend
       dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_BACKEND_URL: http://backend:8000
     depends_on:
       - backend
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_BACKEND_URL=http://backend:8000
+      - VITE_BACKEND_URL=http://backend:8000
     restart: unless-stopped
 
 volumes:

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from ..models import get_db, News
-from ..services.news import NewsService
+from models import get_db, News
+from services.news import NewsService
 
 router = APIRouter(prefix="/news", tags=["news"])
 
@@ -32,31 +32,18 @@ async def get_news(db: Session = Depends(get_db)):
         
         db.commit()
         
-        # Return all news from database
-        db_news = db.query(News).order_by(News.created_at.desc()).limit(10).all()
+        # Return latest 10 news from database, sorted by published_at descending
+        db_news = db.query(News).order_by(News.published_at.desc()).limit(10).all()
         return [
             {
                 "id": news_item.id,
                 "title": news_item.title,
                 "url": news_item.url,
                 "source": news_item.source,
-                "publishedAt": news_item.published_at,
-                "image": news_item.image_url
+                "published_at": news_item.published_at,
+                "image_url": news_item.image_url,
             }
             for news_item in db_news
         ]
-    except Exception as exc:
-        # Fallback to database-only if external API fails
-        db_news = db.query(News).order_by(News.created_at.desc()).limit(10).all()
-        return [
-            {
-                "id": news_item.id,
-                "title": news_item.title,
-                "url": news_item.url,
-                "source": news_item.source,
-                "publishedAt": news_item.published_at,
-                "image": news_item.image_url
-            }
-            for news_item in db_news
-        ] 
- 
+    except Exception as e:
+        return {"error": str(e)}
