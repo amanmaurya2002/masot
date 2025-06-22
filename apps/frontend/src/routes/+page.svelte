@@ -1,38 +1,16 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import type { PageData } from './$types';
+  import NewsCard from '$lib/components/NewsCard.svelte';
+  import EventCard from '$lib/components/EventCard.svelte';
 
-  let events: any[] = [];
-  let news: any[] = [];
-  let loading = true;
-  let error = '';
+  export let data: PageData;
 
-  const API_BASE = 'http://localhost:8000'; // Update if backend runs elsewhere
-
-  // --- New Tab State ---
   const defaultTab = 'news';
   let activeTab: 'news' | 'events' = defaultTab;
 
   function selectTab(tab: 'news' | 'events') {
     activeTab = tab;
   }
-
-  onMount(async () => {
-    try {
-      const [eventsRes, newsRes] = await Promise.all([
-        fetch(`${API_BASE}/events`),
-        fetch(`${API_BASE}/news`),
-      ]);
-      if (!eventsRes.ok || !newsRes.ok) {
-        throw new Error('Network response was not ok');
-      }
-      events = await eventsRes.json();
-      news = await newsRes.json();
-    } catch (e: any) {
-      error = e.message || 'Failed to load data.';
-    } finally {
-      loading = false;
-    }
-  });
 </script>
 
 <svelte:head>
@@ -173,10 +151,8 @@
 </header>
 
 <main class="container">
-  {#if loading}
-    <p class="loading">Fetching the latest updates...</p>
-  {:else if error}
-    <p class="error">{error}</p>
+  {#if data.error}
+    <p class="error">{data.error}</p>
   {:else}
     <div class="tabs">
       <button class="tab-button" class:active={activeTab === 'news'} on:click={() => selectTab('news')}>
@@ -194,31 +170,11 @@
     {#if activeTab === 'events'}
       <section class="events-section">
         <div class="card-grid">
-          {#if events.length === 0}
+          {#if data.events.length === 0}
             <p>No upcoming events found.</p>
           {:else}
-            {#each events as event (event.id)}
-              <div class="card">
-                <h3 class="event-title">{event.title}</h3>
-                <div class="event-meta">
-                  <div class="meta-item">
-                    <span>📅</span>
-                    <span>{new Date(event.date).toLocaleDateString()} at {event.time}</span>
-                  </div>
-                  <div class="meta-item">
-                    <span>📍</span>
-                    <span>{event.venue || 'Venue TBD'}</span>
-                  </div>
-                </div>
-                <a
-                  href={event.external_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="event-link"
-                >
-                  View Event
-                </a>
-              </div>
+            {#each data.events as event (event.id)}
+              <EventCard {event} />
             {/each}
           {/if}
         </div>
@@ -228,22 +184,11 @@
     {#if activeTab === 'news'}
       <section class="news-section">
         <div class="card-grid">
-          {#if news.length === 0}
+          {#if data.news.length === 0}
             <p>No recent news found.</p>
           {:else}
-            {#each news as item (item.id)}
-              <div class="card">
-                {#if item.image_url}
-                  <img src={item.image_url} alt={item.title} class="news-image" />
-                {/if}
-                <h3 class="news-title">{item.title}</h3>
-                <p class="news-meta">
-                  {item.source} - {new Date(item.published_at).toLocaleDateString()}
-                </p>
-                <a href={item.url} target="_blank" rel="noopener noreferrer" class="news-link">
-                  Read Full Article
-                </a>
-              </div>
+            {#each data.news as item (item.id)}
+              <NewsCard {item} />
             {/each}
           {/if}
         </div>

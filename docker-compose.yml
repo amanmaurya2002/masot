@@ -23,6 +23,8 @@ services:
       - NEWS_API_KEY=${NEWS_API_KEY}
       - TICKETMASTER_API_KEY=${TICKETMASTER_API_KEY}
       - DATABASE_URL=postgresql://masot_user:masot_password@postgres:5432/masot
+    volumes:
+      - ./apps/backend:/app
     depends_on:
       - postgres
     restart: unless-stopped

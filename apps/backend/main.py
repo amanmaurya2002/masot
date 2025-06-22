@@ -1,12 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from models.database import create_tables
+from api import router as api_router
 
-from models import create_tables
-from api import events, news
+app = FastAPI(title="MaSOT API")
 
-app = FastAPI(title="MASOT API", version="1.0.0")
+# Create database tables on startup
+@app.on_event("startup")
+def on_startup():
+    create_tables()
 
-# CORS middleware
+# Add CORS middleware to allow cross-origin requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,14 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Create tables on startup
-@app.on_event("startup")
-async def startup_event():
-    create_tables()
-
-# Include routers
-app.include_router(events.router)
-app.include_router(news.router)
+# Include the main API router
+app.include_router(api_router)
 
 @app.get("/")
 async def root():

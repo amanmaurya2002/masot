@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Any
 
 import httpx
+from sqlalchemy.orm import Session
+from models import Event
 
 CACHE_TTL = timedelta(minutes=20)
 
@@ -21,48 +23,47 @@ class _Cache:
 
 _CACHE = _Cache()
 
-TICKETMASTER_API_KEY = os.getenv("TICKETMASTER_API_KEY", "")
+TICKETMASTER_API_KEY = os.getenv("TICKETMASTER_API_KEY")
+TICKETMASTER_API_URL = "https://app.ticketmaster.com/discovery/v2/events.json"
 
 class EventsService:
     @staticmethod
-    async def fetch_events(limit: int = 20) -> List[Dict[str, Any]]:
-        """Fetch latest events for Chandigarh using Ticketmaster API."""
-        if _CACHE.valid():
-            return _CACHE.items[:limit]
-
+    async def fetch_events_from_api():
+        """Fetches upcoming events in Chandigarh from the Ticketmaster API."""
         if not TICKETMASTER_API_KEY:
             return []
 
-        url = (
-            "https://app.ticketmaster.com/discovery/v2/events.json"
-            f"?city=Chandigarh&countryCode=IN&apikey={TICKETMASTER_API_KEY}&size={limit}"
-        )
+        params = {
+            "apikey": TICKETMASTER_API_KEY,
+            "city": "Chandigarh",
+            "size": 10,
+        }
+        async with httpx.AsyncClient() as client:
+            response = await client.get(TICKETMASTER_API_URL, params=params)
+            response.raise_for_status()
+            return response.json().get("_embedded", {}).get("events", [])
 
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(url)
-                response.raise_for_status()
-                data = response.json()
+    @staticmethod
+    def get_events_from_db(db: Session, limit: int = 10):
+        """Retrieves the latest events from the database."""
+        return db.query(Event).order_by(Event.date.desc()).limit(limit).all()
 
-                events = []
-                for event in data.get("_embedded", {}).get("events", []):
-                    events.append({
-                        "title": event.get("name", ""),
-                        "date": event.get("dates", {}).get("start", {}).get("localDate", ""),
-                        "time": event.get("dates", {}).get("start", {}).get("localTime", ""),
-                        "venue": event.get("_embedded", {}).get("venues", [{}])[0].get("name", "TBD"),
-                        "category": event.get("classifications", [{}])[0].get("segment", {}).get("name", ""),
-                        "description": f"Event in Chandigarh",
-                        "image": event.get("images", [{}])[0].get("url", ""),
-                        "url": event.get("url", "")
-                    })
-
-                _CACHE.set(events)
-                return events[:limit]
-
-        except Exception as e:
-            print(f"Error fetching events: {e}")
-            return []
+    @staticmethod
+    def save_events_to_db(db: Session, events_data: list):
+        """Saves a list of events to the database, avoiding duplicates."""
+        for event_data in events_data:
+            existing = db.query(Event).filter(Event.external_url == event_data.get("url")).first()
+            if not existing:
+                event = Event(
+                    title=event_data["name"],
+                    date=event_data["dates"]["start"]["localDate"],
+                    time=event_data["dates"]["start"].get("localTime"),
+                    venue=event_data.get("_embedded", {}).get("venues", [{}])[0].get("name"),
+                    image_url=event_data.get("images", [{}])[0].get("url"),
+                    external_url=event_data.get("url"),
+                )
+                db.add(event)
+        db.commit()
 
 # Backward compatibility
 async def fetch_events(limit: int = 20) -> List[Dict[str, Any]]:

@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Any
 
 import httpx
+from sqlalchemy.orm import Session
+from models import News
 
 CACHE_TTL = timedelta(minutes=20)
 
@@ -21,9 +23,43 @@ class _Cache:
 
 _CACHE = _Cache()
 
-NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
+NEWS_API_KEY = os.getenv("NEWS_API_KEY")
+NEWS_API_URL = "https://newsapi.org/v2/top-headlines"
 
 class NewsService:
+    @staticmethod
+    async def fetch_news_from_api():
+        """Fetches latest news about Chandigarh from the NewsAPI."""
+        if not NEWS_API_KEY:
+            return []
+
+        params = {"q": "Chandigarh", "apiKey": NEWS_API_KEY, "pageSize": 10}
+        async with httpx.AsyncClient() as client:
+            response = await client.get(NEWS_API_URL, params=params)
+            response.raise_for_status()
+            return response.json().get("articles", [])
+
+    @staticmethod
+    def get_news_from_db(db: Session, limit: int = 10):
+        """Retrieves the latest news articles from the database."""
+        return db.query(News).order_by(News.published_at.desc()).limit(limit).all()
+
+    @staticmethod
+    def save_news_to_db(db: Session, news_articles: list):
+        """Saves a list of news articles to the database, avoiding duplicates."""
+        for article in news_articles:
+            existing = db.query(News).filter(News.url == article["url"]).first()
+            if not existing:
+                news_item = News(
+                    title=article["title"],
+                    url=article["url"],
+                    source=article.get("source", {}).get("name"),
+                    published_at=article["publishedAt"],
+                    image_url=article.get("urlToImage"),
+                )
+                db.add(news_item)
+        db.commit()
+
     @staticmethod
     async def fetch_news(limit: int = 10) -> List[Dict[str, Any]]:
         """Fetch latest news articles about Chandigarh using NewsAPI."""

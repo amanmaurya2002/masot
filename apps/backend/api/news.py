@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from models import get_db, News
@@ -8,42 +8,25 @@ router = APIRouter(prefix="/news", tags=["news"])
 
 @router.get("/")
 async def get_news(db: Session = Depends(get_db)):
+    """
+    Fetches the latest news about Chandigarh.
+
+    It first tries to get fresh news from an external API, stores them
+    in the database, and then returns the latest articles from the database.
+    """
     try:
-        # First try to get news from external API
-        external_news = await NewsService.fetch_news()
+        # 1. Fetch fresh news from the external API
+        external_news = await NewsService.fetch_news_from_api()
+
+        # 2. Save the new articles to the database
+        if external_news:
+            NewsService.save_news_to_db(db, external_news)
+
+        # 3. Retrieve and return the latest news from the database
+        db_news = NewsService.get_news_from_db(db, limit=10)
         
-        # Store external news in database
-        for news_data in external_news:
-            # Check if news already exists
-            existing = db.query(News).filter(
-                News.title == news_data["title"],
-                News.url == news_data["url"]
-            ).first()
-            
-            if not existing:
-                news_item = News(
-                    title=news_data["title"],
-                    url=news_data["url"],
-                    source=news_data["source"],
-                    published_at=news_data["publishedAt"],
-                    image_url=news_data.get("image")
-                )
-                db.add(news_item)
+        return db_news
         
-        db.commit()
-        
-        # Return latest 10 news from database, sorted by published_at descending
-        db_news = db.query(News).order_by(News.published_at.desc()).limit(10).all()
-        return [
-            {
-                "id": news_item.id,
-                "title": news_item.title,
-                "url": news_item.url,
-                "source": news_item.source,
-                "published_at": news_item.published_at,
-                "image_url": news_item.image_url,
-            }
-            for news_item in db_news
-        ]
     except Exception as e:
-        return {"error": str(e)}
+        # In case of any error, return a 500 server error
+        raise HTTPException(status_code=500, detail=str(e))
