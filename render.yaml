@@ -1,17 +1,16 @@
 # render.yaml
 # This file configures the deployment of the services on Render.
 
-services:
+databases:
   # 1. PostgreSQL Database
-  - type: psql
-    name: masot-postgres
+  - name: masot-postgres
     # The following are example values. Adjust them as needed.
     # See https://render.com/docs/yaml-spec#databases
     plan: free # 'starter' is a good paid option
     region: oregon
-    ipAllowList: [] # Allow all IPs to connect, or specify your own
-    pgaEnabled: false
+    # ipAllowList: [] # Allow all IPs to connect. For security, it's better to limit this.
 
+services:
   # 2. FastAPI Backend Service
   - type: web
     name: masot-backend
@@ -29,8 +28,7 @@ services:
         value: 3.11
       # Reference the database connection string from the postgres service
       - key: DATABASE_URL
-        fromService:
-          type: psql
+        fromDatabase:
           name: masot-postgres
           property: connectionString
       # Create an environment group in the Render dashboard for your secrets
