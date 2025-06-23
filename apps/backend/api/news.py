@@ -26,7 +26,14 @@ async def get_news(db: Session = Depends(get_db)):
         db_news = NewsService.get_news_from_db(db, limit=10)
         
         return db_news
-        
+
+    except HTTPException:
+        # Re-raise HTTPException directly if it's already one
+        # This preserves the status code and detail from the service layer
+        raise
     except Exception as e:
-        # In case of any error, return a 500 server error
-        raise HTTPException(status_code=500, detail=str(e))
+        # For any other unexpected errors, return a 500 server error
+        # Log the exception for debugging purposes (optional, but good practice)
+        # import logging
+        # logging.exception("Unexpected error in get_news endpoint")
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Any
 
 import httpx
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from models import News
 
@@ -31,13 +32,27 @@ class NewsService:
     async def fetch_news_from_api():
         """Fetches latest news about Chandigarh from the NewsAPI."""
         if not NEWS_API_KEY:
-            return []
+            print("NEWS_API_KEY is not configured. News feature will not work.") # Added for easier debugging
+            raise HTTPException(status_code=503, detail="NEWS_API_KEY is not configured. Please contact administrator.")
 
         params = {"q": "Chandigarh", "apiKey": NEWS_API_KEY, "pageSize": 10}
-        async with httpx.AsyncClient() as client:
-            response = await client.get(NEWS_API_URL, params=params)
-            response.raise_for_status()
-            return response.json().get("articles", [])
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(NEWS_API_URL, params=params)
+                response.raise_for_status()  # Raises HTTPStatusError for 4xx/5xx responses
+                return response.json().get("articles", [])
+        except httpx.HTTPStatusError as exc:
+            # Forward the error from NewsAPI
+            error_detail = f"Error fetching news from external API: {exc.response.status_code} - {exc.response.text}"
+            if exc.response.status_code == 401: # Unauthorized - likely invalid API key
+                error_detail = "Error fetching news: Invalid NEWS_API_KEY."
+            elif exc.response.status_code == 429: # Too many requests
+                error_detail = "Error fetching news: Rate limit exceeded for the external news API."
+            raise HTTPException(status_code=exc.response.status_code, detail=error_detail) from exc
+        except httpx.RequestError as exc:
+            # For other request errors like network issues
+            raise HTTPException(status_code=503, detail=f"Error connecting to external news API: {exc}") from exc
+
 
     @staticmethod
     def get_news_from_db(db: Session, limit: int = 10):
