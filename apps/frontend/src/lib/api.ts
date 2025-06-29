@@ -18,3 +18,10 @@ export async function fetchEvents(): Promise<Event[]> {
   }
   return await response.json();
 }
+
+export async function fetchArxivPapers(limit = 10, daysBack = 30) {
+  const response = await fetch(`${API_BASE}/api/papers/arxiv/fetch?max_results=${limit}&days_back=${daysBack}`);
+  if (!response.ok) throw new Error('Failed to fetch ArXiv papers');
+  const data = await response.json();
+  return data.papers;
+}

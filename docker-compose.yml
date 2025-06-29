@@ -33,7 +33,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_BACKEND_URL=http://localhost:8000
+      - VITE_BACKEND_URL=backend:8000
     volumes:
       - ./apps/frontend:/app
       # This prevents the local node_modules from overwriting the container's

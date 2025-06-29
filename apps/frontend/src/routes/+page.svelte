@@ -2,6 +2,8 @@
   import type { MaterialsNews, ResearchPaper } from '$lib/types';
   import NewsCard from '$lib/components/NewsCard.svelte';
   import ResearchCard from '$lib/components/ResearchCard.svelte';
+  export let data;
+  let papers = data.papers;
 
   // Mock data for materials science news
   let news: MaterialsNews[] = [
@@ -28,34 +30,6 @@
       url: 'https://example.com/ceramic-3d-printing',
       category: 'research',
       tags: ['3D printing', 'ceramics', 'additive manufacturing', 'high-temperature']
-    }
-  ];
-
-  // Mock data for research papers
-  let papers: ResearchPaper[] = [
-    {
-      id: 1,
-      title: 'Machine Learning Approaches for Materials Discovery',
-      authors: ['Dr. Sarah Chen', 'Prof. Michael Rodriguez', 'Dr. James Wilson'],
-      abstract: 'This review presents recent advances in machine learning applications for accelerating materials discovery and design...',
-      journal: 'Advanced Materials',
-      published_at: '2024-05-10T09:00:00Z',
-      doi: '10.1002/adma.202400123',
-      impact_factor: 32.086,
-      keywords: ['machine learning', 'materials discovery', 'AI', 'computational materials'],
-      materials_focus: ['metals', 'polymers', 'ceramics']
-    },
-    {
-      id: 2,
-      title: 'Sustainable Materials for Next-Generation Batteries',
-      authors: ['Dr. Emily Zhang', 'Prof. David Thompson'],
-      abstract: 'We explore environmentally friendly materials and manufacturing processes for lithium-ion battery alternatives...',
-      journal: 'Energy & Environmental Science',
-      published_at: '2024-05-08T11:00:00Z',
-      doi: '10.1039/d4ee00123a',
-      impact_factor: 39.714,
-      keywords: ['batteries', 'sustainability', 'energy storage', 'green materials'],
-      materials_focus: ['battery materials', 'renewable resources']
     }
   ];
 </script>
@@ -137,12 +111,12 @@
   </section>
 
   <section class="section">
-    <h2 class="section-title">Recent Research Papers</h2>
+    <h2 class="section-title">Recent Research Papers (ArXiv)</h2>
     <div class="card-grid">
-      {#if papers.length === 0}
+      {#if !papers || papers.length === 0}
         <p>No recent papers found.</p>
       {:else}
-        {#each papers as paper (paper.id)}
+        {#each papers as paper (paper.arxiv_id)}
           <ResearchCard {paper} />
         {/each}
       {/if}

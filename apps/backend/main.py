@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from models.database import create_tables
+from models.materials import MaterialsNews, ResearchPaper  # Import to ensure tables are created
 from api import router as api_router
 
 app = FastAPI(title="MaSOT API")
