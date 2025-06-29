@@ -8,7 +8,7 @@
   <title>Materials Science & Engineering Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 </svelte:head>
 
 <style>
@@ -17,35 +17,51 @@
     background-color: #f8fafc;
     color: #1e293b;
     margin: 0;
+    line-height: 1.6;
   }
+  
   .header {
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
     color: white;
-    padding: 3rem 1rem;
+    padding: 2rem 1rem;
     text-align: center;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding-left: 2rem;
+  }
+  
+  .logo {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+  
+  .logo-text {
+    text-align: left;
+  }
+  
   .header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 1.6rem;
+    font-weight: 600;
     margin: 0;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.01em;
   }
-  .header p {
-    font-size: 1.1rem;
-    margin: 0.5rem 0 0 0;
-    opacity: 0.9;
-  }
+  
   .container {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
   }
+  
   .section {
     margin-bottom: 3rem;
   }
+  
   .section-title {
     font-size: 1.8rem;
     font-weight: 600;
@@ -54,6 +70,7 @@
     border-bottom: 2px solid #3b82f6;
     padding-bottom: 0.5rem;
   }
+  
   .card-grid {
     display: grid;
     gap: 1.5rem;
@@ -62,8 +79,13 @@
 </style>
 
 <header class="header">
-  <h1>Materials Science & Engineering Hub</h1>
-  <p>Latest breakthroughs, research, and innovations in materials science</p>
+  <div class="header-content">
+    <span class="logo">⚛️</span>
+    
+    <div class="logo-text">
+      <h1>Materials</h1>
+    </div>
+  </div>
 </header>
 
 <main class="container">
