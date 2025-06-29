@@ -1,3 +1,4 @@
-from .database import Event, News, get_db, create_tables
+from .database import get_db, create_tables
+from .materials import MaterialsNews, ResearchPaper
 
-__all__ = ['Event', 'News', 'get_db', 'create_tables'] 
+__all__ = ['MaterialsNews', 'ResearchPaper', 'get_db', 'create_tables'] 

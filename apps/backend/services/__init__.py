@@ -1,4 +1,3 @@
-from .events import EventsService
-from .news import NewsService
+from .arxiv_service import ArxivService
 
-__all__ = ['EventsService', 'NewsService'] 
+__all__ = ['ArxivService'] 
