@@ -2,6 +2,8 @@
   import ResearchCard from '$lib/components/ResearchCard.svelte';
   export let data;
   let papers = data.papers;
+  let sourceStats = data.sourceStats;
+  let totalCount = data.totalCount;
 </script>
 
 <svelte:head>
@@ -62,13 +64,40 @@
     margin-bottom: 3rem;
   }
   
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
   .section-title {
     font-size: 1.8rem;
     font-weight: 600;
-    margin-bottom: 1.5rem;
     color: #1e293b;
     border-bottom: 2px solid #3b82f6;
     padding-bottom: 0.5rem;
+    margin: 0;
+  }
+  
+  .source-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .stat-item {
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+  
+  .stat-number {
+    font-weight: 600;
+    color: #3b82f6;
   }
   
   .card-grid {
@@ -90,12 +119,27 @@
 
 <main class="container">
   <section class="section">
-    <h2 class="section-title">Recent Research Papers (ArXiv)</h2>
+    <div class="section-header">
+      <h2 class="section-title">Recent Research Papers</h2>
+      {#if sourceStats && Object.keys(sourceStats).length > 0}
+        <div class="source-stats">
+          <div class="stat-item">
+            Total: <span class="stat-number">{totalCount}</span>
+          </div>
+          {#each Object.entries(sourceStats) as [source, count]}
+            <div class="stat-item">
+              {source}: <span class="stat-number">{count}</span>
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </div>
+    
     <div class="card-grid">
       {#if !papers || papers.length === 0}
         <p>No recent papers found.</p>
       {:else}
-        {#each papers as paper (paper.arxiv_id)}
+        {#each papers as paper (paper.arxiv_id || paper.pmc_id || paper.doi || paper.title)}
           <ResearchCard {paper} />
         {/each}
       {/if}

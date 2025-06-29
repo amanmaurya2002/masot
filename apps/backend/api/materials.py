@@ -6,11 +6,13 @@ from datetime import datetime, timedelta
 from models.database import get_db
 from models.materials import MaterialsNews, ResearchPaper
 from services.arxiv_service import ArxivService
+from services.multi_source_service import MultiSourceService
 
 router = APIRouter(prefix="/api", tags=["materials"])
 
-# Initialize ArXiv service
+# Initialize services
 arxiv_service = ArxivService()
+multi_source_service = MultiSourceService()
 
 
 @router.get("/papers")
@@ -139,6 +141,77 @@ async def search_arxiv_by_topic(
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error searching ArXiv: {str(e)}")
+
+
+@router.get("/papers/pubmed")
+async def fetch_pubmed_papers(
+    query: str = Query("materials science", description="Search query"),
+    max_results: int = Query(20, ge=1, le=100)
+):
+    """Fetch materials science papers from PubMed Central"""
+    try:
+        papers = await multi_source_service.fetch_from_pubmed_central(query, max_results)
+        
+        return {
+            "papers": papers,
+            "count": len(papers),
+            "source": "PubMed Central",
+            "query": query
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching from PubMed Central: {str(e)}")
+
+
+@router.get("/papers/doaj")
+async def fetch_doaj_papers(
+    query: str = Query("materials science", description="Search query"),
+    max_results: int = Query(20, ge=1, le=100)
+):
+    """Fetch materials science papers from Directory of Open Access Journals"""
+    try:
+        papers = await multi_source_service.fetch_from_doaj(query, max_results)
+        
+        return {
+            "papers": papers,
+            "count": len(papers),
+            "source": "DOAJ",
+            "query": query
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching from DOAJ: {str(e)}")
+
+
+@router.get("/papers/all-sources")
+async def fetch_all_sources(
+    query: str = Query("materials science", description="Search query"),
+    max_results: int = Query(10, ge=1, le=50)
+):
+    """Fetch papers from all available sources"""
+    try:
+        results = await multi_source_service.fetch_all_sources(query, max_results)
+        
+        # Combine all papers
+        all_papers = []
+        for source, papers in results.items():
+            for paper in papers:
+                paper["source"] = source.replace("_", " ").title()
+                all_papers.append(paper)
+        
+        # Sort by published date (newest first)
+        all_papers.sort(key=lambda x: x.get("published_at", ""), reverse=True)
+        
+        return {
+            "papers": all_papers,
+            "count": len(all_papers),
+            "sources": list(results.keys()),
+            "query": query,
+            "source_counts": {source: len(papers) for source, papers in results.items()}
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching from all sources: {str(e)}")
 
 
 @router.get("/news")
