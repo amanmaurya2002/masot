@@ -1,6 +1,38 @@
 # MASOT - Chandigarh Events Platform
 
-A modern, full-stack application for discovering and managing events in Chandigarh, built with Next.js, FastAPI, and PostgreSQL.
+A modern, full-stack application for discovering and managing events in Chandigarh, built with SvelteKit, FastAPI, and PostgreSQL.
+
+## 🚀 Getting Started (for Local Development)
+
+This project is fully containerized. The only prerequisite is having **Docker and Docker Compose** installed.
+
+1.  **Set Up Environment Variables**
+
+    First, create your own environment file by copying the example:
+
+    ```bash
+    cp .env.example .env
+    ```
+    *For local development, you don't need to change any of the default values in this file.*
+
+2.  **Build and Run the Application**
+
+    With Docker running, execute the following command from the project root:
+
+    ```bash
+    docker-compose up --build
+    ```
+
+3.  **Access the Application**
+
+    That's it! The application is now running:
+    *   **Frontend:** [http://localhost:3000](http://localhost:3000)
+    *   **Backend API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+
+    Changes you make to the code in `apps/frontend` or `apps/backend` will trigger automatic reloading.
+
+---
+
 
 ## 🏗️ Project Structure
 

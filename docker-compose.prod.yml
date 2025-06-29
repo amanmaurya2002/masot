@@ -2,9 +2,10 @@ version: "3.9"
 
 services:
   nginx:
-    image: nginx:latest
+    image: nginx:1.25-alpine
     ports:
       - "80:80"
+      # - "443:443" # Uncomment if you set up SSL
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
@@ -13,27 +14,36 @@ services:
     restart: always
 
   postgres:
-    # In production, we don't expose the database port to the host
-    ports: []
+    image: postgres:15-alpine
+    environment:
+      # These will be loaded from a .env file on your VM
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     restart: always
 
   backend:
-    # Remove development-specific settings
-    ports: []
-    volumes: []
+    build:
+      context: ./apps/backend
     environment:
-      # These variables are loaded from the .env file created by the startup script
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       - SECRET_KEY=${SECRET_KEY}
+    depends_on:
+      - postgres
     restart: always
 
   frontend:
-    # Remove development-specific settings
-    ports: []
-    volumes: []
+    build:
+      context: ./apps/frontend
     environment:
-      # This URL is for communication *inside* the Docker network, behind Nginx
-      - VITE_BACKEND_URL=http://backend:8000
+      # This is a PRIVATE env var for the SvelteKit server proxy
+      - BACKEND_URL=http://backend:8000
       - HOST=0.0.0.0
-      - PORT=3000 # The frontend app will listen on this port inside the container
-    restart: always 
+      - PORT=3000
+    restart: always
+
+volumes:
+  postgres_data:
+    # This ensures the volume is created and managed by Docker
