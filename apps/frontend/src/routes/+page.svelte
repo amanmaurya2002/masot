@@ -1,37 +1,7 @@
 <script lang="ts">
-  import type { MaterialsNews, ResearchPaper } from '$lib/types';
-  import NewsCard from '$lib/components/NewsCard.svelte';
   import ResearchCard from '$lib/components/ResearchCard.svelte';
   export let data;
   let papers = data.papers;
-
-  // Mock data for materials science news
-  let news: MaterialsNews[] = [
-    {
-      id: 1,
-      title: 'Breakthrough in Graphene-Based Supercapacitors',
-      summary: 'Researchers develop new graphene composite material with 3x higher energy density',
-      content: 'A team at MIT has developed a novel graphene-based composite material that shows remarkable improvements in energy storage capacity...',
-      source: 'Nature Materials',
-      published_at: '2024-05-15T10:00:00Z',
-      image_url: null,
-      url: 'https://example.com/graphene-breakthrough',
-      category: 'breakthrough',
-      tags: ['graphene', 'energy storage', 'supercapacitors', 'composites']
-    },
-    {
-      id: 2,
-      title: 'New 3D Printing Method for High-Temperature Ceramics',
-      summary: 'Innovative additive manufacturing technique enables complex ceramic structures',
-      content: 'Scientists at Stanford University have developed a new 3D printing method that allows for the creation of complex ceramic structures...',
-      source: 'Science Advances',
-      published_at: '2024-05-12T14:30:00Z',
-      image_url: null,
-      url: 'https://example.com/ceramic-3d-printing',
-      category: 'research',
-      tags: ['3D printing', 'ceramics', 'additive manufacturing', 'high-temperature']
-    }
-  ];
 </script>
 
 <svelte:head>
@@ -97,19 +67,6 @@
 </header>
 
 <main class="container">
-  <section class="section">
-    <h2 class="section-title">Latest News & Breakthroughs</h2>
-    <div class="card-grid">
-      {#if news.length === 0}
-        <p>No recent news found.</p>
-      {:else}
-        {#each news as item (item.id)}
-          <NewsCard {item} />
-        {/each}
-      {/if}
-    </div>
-  </section>
-
   <section class="section">
     <h2 class="section-title">Recent Research Papers (ArXiv)</h2>
     <div class="card-grid">
