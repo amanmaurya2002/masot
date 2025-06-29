@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+      - frontend
+    restart: always
+
+  postgres:
+    # In production, we don't expose the database port to the host
+    ports: []
+    restart: always
+
+  backend:
+    # Remove development-specific settings
+    ports: []
+    volumes: []
+    environment:
+      # These variables are loaded from the .env file created by the startup script
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+    restart: always
+
+  frontend:
+    # Remove development-specific settings
+    ports: []
+    volumes: []
+    environment:
+      # This URL is for communication *inside* the Docker network, behind Nginx
+      - VITE_BACKEND_URL=http://backend:8000
+      - HOST=0.0.0.0
+      - PORT=3000 # The frontend app will listen on this port inside the container
+    restart: always 
